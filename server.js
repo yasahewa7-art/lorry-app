@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ඔබගේ Google AI Studio API Key එක මෙහි ඇතුළත් කර ඇත
-const genAI = new GoogleGenerativeAI('AQ.Ab8RN6KuDCvxgAqjrC2BJRpHTUrvZuMssnWYV9yQQER9WLLuzeg');
+// ඔබ ලබා දුන් API Key එක මෙහි සෘජුවම ඇතුළත් කර ඇත
+const genAI = new GoogleGenerativeAI('AQ.Ab8RN6JPWS6jTrmHg6SCOBs4iRkc-YpzCSFx-n3gF7cAa3Mog');
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
