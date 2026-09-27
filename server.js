@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public')); // Frontend එක පෙන්වීමට
 
-// මෙතැනට ඔයාගේ සැබෑ Google AI Studio API Key එක දාන්න
-const genAI = new GoogleGenerativeAI('AIzaSyAI7y-YOUR-API-KEY-HERE');
+// ඔයාගේ සැබෑ Google AI Studio API Key එක මෙහි ඇතුළත් කර ඇත
+const genAI = new GoogleGenerativeAI('AQ.Ab8RN6K2EraXyiwjGE-yaOpb5eQB-Mw2WsCepSoeEz9HZJa0kA');
 
 // මුල් පිටුවට index.html යැවීම
 app.get('/', (req, res) => {
