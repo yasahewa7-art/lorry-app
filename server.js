@@ -5,8 +5,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// මෙහි ඔබේ Google Gemini API Key එක ඇතුළත් කරන්න (AIzaSy... වලින් පටන් ගන්නා නිවැරදි කී එකක් දෙන්න)
-const GEMINI_API_KEY = "ඔබේ_API_Key_එක_මෙහි_දාන්න";
+// ඔබ ලබා දුන් නිවැරදි API Key එක මෙහි ඇතුළත් කර ඇත
+const GEMINI_API_KEY = "AQ.Ab8RN6K2EraXyiwjGE-yaOpb5eQB-Mw2WsCepSoeEz9HZJa0kA";
 
 // ගාණ ගණනය කිරීමේ සූත්‍රය
 function calculateFare(distanceInKm) {
@@ -28,7 +28,7 @@ function calculateFare(distanceInKm) {
     return Math.round(totalFare);
 }
 
-// API Endpoint එක (Frontend එකෙන් මේකටයි රික්වෙස්ට් එක එන්නේ)
+// API Endpoint එක
 app.post('/api/calculate', async (req, res) => {
     const { destination } = req.body;
     
