@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Railway හි Variables වලින් API Key එක ලබා ගැනීම
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// ඔබගේ අලුත් නිවැරදි API Key එක මෙහි සෘජුවම යොදා ඇත
+const genAI = new GoogleGenerativeAI('AQ.Ab8RN6JRMehBl0VjT2hXUpgICJ6SQoMGwwfVggMVsqzBAl-ZUg');
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
