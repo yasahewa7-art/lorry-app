@@ -5,50 +5,44 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ගාණ ගණනය කරන ෆන්ක්ෂන් එක (Fare Calculation Logic)
+// ගාණ ගණනය කිරීමේ සූත්‍රය
 function calculateFare(distanceInKm) {
     let totalFare = 0;
-
     if (distanceInKm <= 1.0) {
         totalFare = 800;
-    } 
-    else if (distanceInKm <= 1.5) {
+    } else if (distanceInKm <= 1.5) {
         totalFare = 1500;
-    } 
-    else if (distanceInKm <= 7.0) {
+    } else if (distanceInKm <= 7.0) {
         totalFare = 2000;
-    } 
-    else if (distanceInKm <= 16.0) {
+    } else if (distanceInKm <= 16.0) {
         let extraKm = distanceInKm - 7;
         let extraRate = (7000 - 2000) / (16 - 7);
         totalFare = 2000 + (extraKm * extraRate);
-    } 
-    else {
+    } else {
         let extraKm = distanceInKm - 16;
         totalFare = 7000 + (extraKm * 500);
     }
-
     return Math.round(totalFare);
 }
 
-// API Endpoint එක (ඇප් එකෙන් දුර එව්වම ගාණ ප්‍රතිචාර දක්වන තැන)
-app.post('/api/calculate-fare', (req, res) => {
-    const { distanceKm } = req.body;
-
-    if (distanceKm === undefined || distanceKm < 0) {
-        return res.status(400).json({ error: "කරුණාකර సరైన දුර ප්‍රමාණයක් (Distance) ලබා දෙන්න." });
+// API endpoint එක
+app.post('/api/calculate', (req, res) => {
+    const { destination, distance } = req.body;
+    
+    // ඩීටීආර් / කිලෝමීටර් ලැබුණු පසු ගාණ සකස් කිරීම
+    if (!distance) {
+        return res.status(400).json({ error: "කිලෝමීටර් ප්‍රමාණය අවශ්‍යයි." });
     }
 
-    let fare = calculateFare(distanceKm);
-
+    let fare = calculateFare(parseFloat(distance));
     res.json({
-        distanceKm: distanceKm,
-        totalFareLKR: fare
+        destination: destination,
+        distance: distance,
+        fare: fare
     });
 });
 
-// සර්වර් එක ස්ටාර්ට් කිරීම
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Bolero Lorry Backend සර්වර් එක ක්‍රියාත්මකයි: http://localhost:${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
