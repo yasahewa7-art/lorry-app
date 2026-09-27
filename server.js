@@ -6,12 +6,17 @@ const { GoogleGenAI } = require('@google/genai');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public')); // Frontend එක public ෆෝල්ඩර් එකක තැබිය හැක, හෝ යට සර්ව් කර ඇත
+app.use(express.static('public')); // හෝ index.html එක සමඟ එකම ෆෝල්ඩර් එකක තැබීමට
 
-// Google AI අනුමත API Key එක මෙහි ඇතුළත් කර ඇත
+// මෙතැනට ඔයාගේ සැබෑ Google AI Studio API Key එක දාන්න
 const ai = new GoogleGenAI({ apiKey: 'YOUR_GEMINI_API_KEY' });
 
-// මාතර පඹුරුන සිට ගාස්තු ගණනය කිරීමේ සූත්‍රය සහ API Call එක
+// සර්වර් මඟින් index.html පෙන්වීමට
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+// ගාස්තු ගණනය කිරීමේ API Endpoint එක
 app.post('/api/calculate-fare', async (req, res) => {
     try {
         const { destination } = req.body;
