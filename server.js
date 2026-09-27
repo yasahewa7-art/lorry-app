@@ -1,14 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public')); // Frontend එක පෙන්වීමට
 
-// Google AI Studio API Key එක මෙහි ඇතුළත් කර ඇත
-const ai = new GoogleGenAI({ apiKey: 'AIzaSyAI7y-YOUR-API-KEY-HERE' });
+// මෙතැනට ඔයාගේ සැබෑ Google AI Studio API Key එක දාන්න
+const genAI = new GoogleGenerativeAI('AIzaSyAI7y-YOUR-API-KEY-HERE');
 
 // මුල් පිටුවට index.html යැවීම
 app.get('/', (req, res) => {
@@ -24,6 +24,8 @@ app.post('/api/calculate-fare', async (req, res) => {
             return res.status(400).json({ error: 'කරුණාකර ගමනාන්තය ඇතුළත් කරන්න.' });
         }
 
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
         const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා ඇති සැබෑ මාර්ග දුර (කිලෝමීටර වලින්) කොපමණදැයි ගූගල් සිතියම් දත්ත මත පදනම්ව ගණනය කරන්න. 
         පිළිතුර ලබා දීමේදී:
         1. දුර කිලෝමීටර (km) වලින් පමණක් අංකයක් ලෙස මුලින්ම දෙන්න.
@@ -32,12 +34,10 @@ app.post('/api/calculate-fare', async (req, res) => {
         Distance: [දුර කි.මී ප්‍රමාණය] km
         Fare: Rs. [මුළු ගාස්තුව]`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const textResult = response.text();
 
-        const textResult = response.text;
         res.json({ success: true, result: textResult });
 
     } catch (error) {
