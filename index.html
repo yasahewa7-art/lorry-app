@@ -3,98 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolero Lorry AI Assistant - Sri Lanka</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .chat-container { background: white; width: 100%; max-width: 450px; height: 520px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-        .chat-header { background: #28a745; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-        .message { padding: 10px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 14px; }
-        .bot-msg { background: #e2e2e2; color: #333; align-self: flex-start; }
-        .user-msg { background: #28a745; color: white; align-self: flex-end; }
-        .chat-input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #ddd; }
-        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none; font-size: 14px; }
-        .chat-input-area button { background: #28a745; color: white; border: none; padding: 10px 15px; margin-left: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .chat-input-area button:hover { background: #218838; }
-    </style>
+    <title>Bolero Lorry Fare Calculator - Matara Pamburana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-100 h-screen flex flex-col justify-between">
 
-    <div class="chat-container">
-        <div class="chat-header">Bolero Lorry AI Assistant 🚚</div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-msg">ආයුබෝවන්! මම Bolero ලොරි සේවයේ AI සහායකයායි. පඹුරුන ඔෆිස් සිට ඔබට යාමට අවශ්‍ය **ගමනාන්තය (නගරය හෝ ගම)** මෙහි ලියන්න.</div>
-        </div>
+    <!-- Header -->
+    <header class="bg-blue-900 text-white p-4 text-center shadow-md">
+        <h1 class="text-xl font-bold">🚚 Bolero Lorry Fare Chatbot</h1>
+        <p class="text-sm text-blue-200">මාතර පඹුරුන සිට ඕනෑම ප්‍රදේශයකට ගාස්තු ගණනය කිරීම</p>
+    </header>
 
-        <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="ගමනාන්තය ලියන්න..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">යවන්න</button>
+    <!-- Chat Box -->
+    <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 max-w-2xl mx-auto w-full">
+        <div class="flex justify-start">
+            <div class="bg-white p-3 rounded-lg shadow max-w-xs text-gray-800">
+                ආයුබෝවන්! මාතර පඹුරුන සිට ඔබ යා යුතු ගමනාන්තය (නගරය හෝ ලිපිනය) මෙතен ටයිප් කරන්න.
+            </div>
         </div>
     </div>
 
-    <script>
-        function appendMessage(text, sender, isLoading = false) {
-            const chatMessages = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender === 'user' ? 'user-msg' : 'bot-msg'}`;
-            if (isLoading) msgDiv.id = 'loadingMsg';
-            msgDiv.innerHTML = text;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+    <!-- Input Area -->
+    <div class="bg-white border-t p-4 shadow-lg">
+        <form id="chat-form" class="flex max-w-2xl mx-auto gap-2">
+            <input type="text" id="destination-input" placeholder="උදා: කොළඹ,ගාල්ල,කුවෙනි..." 
+                   class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
+                යවන්න
+            </button>
+        </form>
+    </div>
 
-        async function processAIQuery(userText) {
-            appendMessage("මඳක් සිටින්න, දුර මනිමින් ගාස්තුව ගණනය කරමින් පවතී...", 'bot', true);
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const destinationInput = document.getElementById('destination-input');
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const destination = destinationInput.value.trim();
+            if (!destination) return;
+
+            // User message add
+            appendMessage(destination, 'user');
+            destinationInput.value = '';
+
+            // Loading message
+            const loadingId = appendMessage('ගණනය කරමින් පවතී, කරුණාකර රැඳී සිටින්න...', 'bot');
 
             try {
-                const response = await fetch('http://localhost:3000/api/calculate', {
+                const response = await fetch('/api/calculate-fare', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ destination: userText })
+                    body: JSON.stringify({ destination })
                 });
 
                 const data = await response.json();
                 
-                const loadingEl = document.getElementById('loadingMsg');
-                if (loadingEl) loadingEl.remove();
+                // Remove loading and show result
+                document.getElementById(loadingId).remove();
 
-                if (!data.success) {
-                    appendMessage(data.message || "සමාවෙන්න, දෝෂයක් සිදු විය.", 'bot');
-                    return;
+                if (data.success) {
+                    appendMessage(data.result, 'bot');
+                } else {
+                    appendMessage('සමාවන්න, දෝෂයක් සිදු විය.', 'bot');
                 }
-
-                let reply = `📍 **ගමනාන්තය:** ${data.destination} (${data.distance} km)<br>💰 **ඇස්තමේන්තුගත ගාණ:** LKR ${data.fare}.00<br><br>මෙම ගමන වෙන්කරවා ගැනීමට අවශ්‍ය නම් අමතන්න!`;
-                appendMessage(reply, 'bot');
-
-            } catch (error) {
-                const loadingEl = document.getElementById('loadingMsg');
-                if (loadingEl) loadingEl.remove();
-                appendMessage("සර්වර් එක සමඟ සම්බන්ධ වීමට නොහැකි විය. කරුණාකර සර්වර් එක රන් කර ඇති බව තහවුරු කරන්න.", 'bot');
-                console.error(error);
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                appendMessage('ሰර්වර් එක සමඟ සම්බන්ධ වීමට නොහැකි විය.', 'bot');
             }
-        }
+        });
 
-        function sendMessage() {
-            const inputField = document.getElementById('userInput');
-            const userText = inputField.value.trim();
-
-            if (!userText) return;
-
-            appendMessage(userText, 'user');
-            inputField.value = "";
-
-            setTimeout(() => {
-                processAIQuery(userText);
-            }, 300);
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
+        function appendMessage(text, sender) {
+            const msgId = 'msg-' + Date.now();
+            const div = document.createElement('div');
+            div.id = msgId;
+            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = `p-3 rounded-lg shadow max-w-md whitespace-pre-line ${
+                sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'
+            }`;
+            bubble.innerText = text;
+            
+            div.appendChild(bubble);
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgId;
         }
     </script>
-
 </body>
 </html>
