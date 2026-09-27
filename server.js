@@ -1,17 +1,16 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public')); // හෝ index.html එක සමඟ එකම ෆෝල්ඩර් එකක තැබීමට
+app.use(express.json());
+app.use(express.static('public')); // Frontend එක පෙන්වීමට
 
-// මෙතැනට ඔයාගේ සැබෑ Google AI Studio API Key එක දාන්න
-const ai = new GoogleGenAI({ apiKey: 'YOUR_GEMINI_API_KEY' });
+// Google AI Studio API Key එක මෙහි ඇතුළත් කර ඇත
+const ai = new GoogleGenAI({ apiKey: 'AIzaSyAI7y-YOUR-API-KEY-HERE' });
 
-// සර්වර් මඟින් index.html පෙන්වීමට
+// මුල් පිටුවට index.html යැවීම
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
@@ -25,7 +24,7 @@ app.post('/api/calculate-fare', async (req, res) => {
             return res.status(400).json({ error: 'කරුණාකර ගමනාන්තය ඇතුළත් කරන්න.' });
         }
 
-        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා ඇති සැබෑ මාර්ග දුර (කැලිමීටර වලින්) කොපමණදැයි ගූගල් සිතියම් දත්ත මත පදනම්ව ගණනය කරන්න. 
+        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා ඇති සැබෑ මාර්ග දුර (කිලෝමීටර වලින්) කොපමණදැයි ගූගල් සිතියම් දත්ත මත පදනම්ව ගණනය කරන්න. 
         පිළිතුර ලබා දීමේදී:
         1. දුර කිලෝමීටර (km) වලින් පමණක් අංකයක් ලෙස මුලින්ම දෙන්න.
         2. ඊට අමතරව, මාතර පඹුරුන සිට ${destination} දක්වා Mahindra Bolero Lorry රථයක ගාස්තුව ගණනය කරන්න (මූලික ගාස්තුව රු. 3500 ක් සහ ඊට පසු එක් කිලෝමීටරයකට රු. 250 ක් ලෙස).
