@@ -1,9 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
 
+const app = express();
 app.use(express.json());
 app.use(cors());
+
+// මෙහි ඔබේ Google Gemini API Key එක ඇතුළත් කරන්න (AIzaSy... වලින් පටන් ගන්නා නිවැරදි කී එකක් දෙන්න)
+const GEMINI_API_KEY = "ඔබේ_API_Key_එක_මෙහි_දාන්න";
 
 // ගාණ ගණනය කිරීමේ සූත්‍රය
 function calculateFare(distanceInKm) {
@@ -25,21 +28,50 @@ function calculateFare(distanceInKm) {
     return Math.round(totalFare);
 }
 
-// API endpoint එක
-app.post('/api/calculate', (req, res) => {
-    const { destination, distance } = req.body;
+// API Endpoint එක (Frontend එකෙන් මේකටයි රික්වෙස්ට් එක එන්නේ)
+app.post('/api/calculate', async (req, res) => {
+    const { destination } = req.body;
     
-    // ඩීටීආර් / කිලෝමීටර් ලැබුණු පසු ගාණ සකස් කිරීම
-    if (!distance) {
-        return res.status(400).json({ error: "කිලෝමීටර් ප්‍රමාණය අවශ්‍යයි." });
+    if (!destination) {
+        return res.status(400).json({ error: 'ගමනාන්තය ඇතුළත් කර නැත.' });
     }
 
-    let fare = calculateFare(parseFloat(distance));
-    res.json({
-        destination: destination,
-        distance: distance,
-        fare: fare
-    });
+    try {
+        const promptText = `Sri Lanka: Calculate the road distance in kilometers (only the number) from Pamburana (Matara) to "${destination}". If it is a valid place in Sri Lanka, reply with ONLY the numeric value of kilometers (e.g., 14 or 45.5). If the place does not exist or is invalid, reply with "INVALID".`;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.candidates || data.candidates.length === 0) {
+            return res.json({ success: false, message: 'AI වෙතින් ප්‍රතිචාරයක් ලැබුණේ නැත.' });
+        }
+
+        let aiOutput = data.candidates[0].content.parts[0].text.trim();
+        let distance = parseFloat(aiOutput);
+
+        if (isNaN(distance) || aiOutput.includes("INVALID")) {
+            return res.json({ success: false, message: `සමාවෙන්න, "${destination}" යන ස්ථානය හඳුනාගැනීමට නොහැකි විය.` });
+        }
+
+        let fare = calculateFare(distance);
+        res.json({
+            success: true,
+            destination: destination,
+            distance: distance,
+            fare: fare
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'සර්වර් දෝෂයක් සිදු විය.' });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
