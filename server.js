@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // ඔබගේ අලුත් නිවැරදි API Key එක මෙහි සෘජුවම යොදා ඇත
-const genAI = new GoogleGenerativeAI('AQ.Ab8RN6JRMehBl0VjT2hXUpgICJ6SQoMGwwfVggMVsqzBAl-ZUg');
+const genAI = new GoogleGenerativeAI('AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ');
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
