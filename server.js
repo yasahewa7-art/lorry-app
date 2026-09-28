@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch'); // හෝ Node 18+ වල බිල්ට්-ඉන් fetch පාවිච්චි වේ
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const genAI = new GoogleGenerativeAI('AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ');
+// ඔබේ AQ. වලින් පටන් ගන්නා API Key එක මෙහි දමන්න
+const API_KEY = 'AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ';
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -21,20 +22,32 @@ app.post('/api/calculate-fare', async (req, res) => {
             return res.status(400).json({ error: 'කරුණාකර ගමනාන්තය ඇතුළත් කරන්න.' });
         }
 
-        const model = genAI.getGenerativeModel({ 
-            model: 'gemini-1.5-flash',
-            systemInstruction: "ඔබ ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට අනෙකුත් ප්‍රදේශවලට Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තු ගණනය කරදෙන AI සහායකයෙක් වෙයි. මූලික ගාස්තුව රු. 3500 ක් වන අතර ඊට පසු එක් කිලෝමීටරයකට රු. 250 ක් අය කෙරේ. ලැයිස්තුවේ නැති ඕනෑම අභ්‍යන්තර ප්‍රදේශයක් හෝ නගරයක් සඳහාද Google Maps දත්ත මත පදනම්ව දුර නිවැරදිව ගණනය කර ලබා දෙන්න."
-        });
-
-        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා ඇති සැබෑ මාර්ග දුර (කිලෝමීටර වලින්) ගණනය කරන්න.
+        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තුව ගණනය කරන්න. මූලික ගාස්තුව රු. 3500 ක් වන අතර එක් කිලෝමීටරයකට රු. 250 කි.
         පහත ආකෘතියට පමණක් පිළිතුර දෙන්න:
         Distance: [දුර කි.මී ප්‍රමාණය] km
         Fare: Rs. [මුළු ගාස්තුව]`;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const textResult = response.text();
+        // කෙළින්ම Google Gemini REST API එකට Fetch රික්වෙස්ට් එකක් යැවීම (AQ. keys සඳහා වඩාත්ම ගැළපේ)
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: "ඔබ ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට අනෙකුත් ප්‍රදේශවලට Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තු ගණනය කරදෙන AI සහායකයෙක් වෙයි." }]
+                }
+            })
+        });
 
+        const data = await apiResponse.json();
+
+        if (!apiResponse.ok) {
+            throw new Error(data.error?.message || 'API Error occurred');
+        }
+
+        const textResult = data.candidates[0].content.parts[0].text;
         res.json({ success: true, result: textResult });
 
     } catch (error) {
