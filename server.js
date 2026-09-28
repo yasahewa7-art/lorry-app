@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ඔබේ AQ. වලින් පටන් ගන්නා කී එක මෙහි දමන්න
+// ඔබේ AQ. කී එක මෙහි ඇත
 const API_KEY = 'AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ';
 
 app.get('/', (req, res) => {
@@ -21,17 +21,16 @@ app.post('/api/calculate-fare', async (req, res) => {
             return res.status(400).json({ error: 'කරුණාකර ගමනාන්තය ඇතුළත් කරන්න.' });
         }
 
-        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තුව ගණනය කරන්න. මූලික ගාස්තුව රු. 3500 ක් වන අතර එක් කිලෝමීටරයකට රු. 250 කි.
-        පහත ආකෘතියට පමණක් පිළිතුර දෙන්න:
+        const prompt = `ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට ${destination} දක්වා Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තුව ගණනය කරන්න. මූලික ගාස්තුව රු. 3500 ක් වන අතර එක් කිලෝමීටරයකට රු. 250 කි. Google Maps දත්ත මත පදනම්ව දුර ගණනය කර පහත ආකෘතියට පමණක් පිළිතුර දෙන්න:
         Distance: [දුර කි.මී ප්‍රමාණය] km
         Fare: Rs. [මුළු ගාස්තුව]`;
 
-        // AQ. (OAuth) කී සඳහා Bearer Token ලෙස Header එක හරහා රික්වෙස්ට් එක යැවීම
+        // AQ. ටෝකන් සඳහා නිවැරදි REST API ක්‍රමවේදය
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'x-goog-api-key': API_KEY
             },
             body: JSON.stringify({
                 contents: [{
