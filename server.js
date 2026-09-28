@@ -1,13 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch'); // හෝ Node 18+ වල බිල්ට්-ඉන් fetch පාවිච්චි වේ
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ඔබේ AQ. වලින් පටන් ගන්නා API Key එක මෙහි දමන්න
+// ඔබේ AQ. වලින් පටන් ගන්නා කී එක මෙහි දමන්න
 const API_KEY = 'AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ';
 
 app.get('/', (req, res) => {
@@ -27,24 +26,24 @@ app.post('/api/calculate-fare', async (req, res) => {
         Distance: [දුර කි.මී ප්‍රමාණය] km
         Fare: Rs. [මුළු ගාස්තුව]`;
 
-        // කෙළින්ම Google Gemini REST API එකට Fetch රික්වෙස්ට් එකක් යැවීම (AQ. keys සඳහා වඩාත්ම ගැළපේ)
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        // AQ. (OAuth) කී සඳහා Bearer Token ලෙස Header එක හරහා රික්වෙස්ට් එක යැවීම
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
             body: JSON.stringify({
                 contents: [{
                     parts: [{ text: prompt }]
-                }],
-                systemInstruction: {
-                    parts: [{ text: "ඔබ ශ්‍රී ලංකාවේ මාතර පඹුරුන සිට අනෙකුත් ප්‍රදේශවලට Mahindra Bolero Lorry රථයක ප්‍රවාහන ගාස්තු ගණනය කරදෙන AI සහායකයෙක් වෙයි." }]
-                }
+                }]
             })
         });
 
         const data = await apiResponse.json();
 
         if (!apiResponse.ok) {
-            throw new Error(data.error?.message || 'API Error occurred');
+            throw new Error(data.error?.message || JSON.stringify(data));
         }
 
         const textResult = data.candidates[0].content.parts[0].text;
