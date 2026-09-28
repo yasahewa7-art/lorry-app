@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ඔබගේ අලුත් නිවැරදි API Key එක මෙහි සෘජුවම යොදා ඇත
+// ඔබගේ API Key එක මෙහි යොදා ඇත
 const genAI = new GoogleGenerativeAI('AQ.Ab8RN6I10M2yHBbT2o_LyESEhYSbCRNieznpmXR6RNkx_UQsQ');
 
 app.get('/', (req, res) => {
@@ -40,7 +40,8 @@ app.post('/api/calculate-fare', async (req, res) => {
 
     } catch (error) {
         console.error('API Error:', error);
-        res.status(500).json({ success: false, error: 'දෝෂයක් සිදු විය. කරුණාකර නැවත උත්සාහ කරන්න.' });
+        // මෙතැනදී සැබෑ දෝෂය (Error message එක) බ්‍රව්සරයට යවනු ලැබේ
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
