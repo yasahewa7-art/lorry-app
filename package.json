@@ -1,7 +1,7 @@
 {
-  "name": "fare-calculator",
+  "name": "paburana-fare-calculator",
   "version": "1.0.0",
-  "description": "Paburana vehicle fare calculator",
+  "description": "Paburana Matara Vehicle Fare Calculator",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
