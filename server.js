@@ -39,9 +39,13 @@ app.post('/api/calculate-fare', async (req, res) => {
         res.json({ success: true, result: textResult });
 
     } catch (error) {
-        console.error('API Error:', error);
-        // මෙතැනදී සැබෑ දෝෂය (Error message එක) බ්‍රව්සරයට යවනු ලැබේ
-        res.status(500).json({ success: false, error: error.message });
+        console.error('API Error Details:', error);
+        // මෙතැනදී API එකෙන් එන සැබෑ දෝෂය බ්‍රව්සරයේ Response එකට යවනු ලැබේ
+        res.status(500).json({ 
+            success: false, 
+            error: error.message || 'Unknown error', 
+            fullError: error.toString() 
+        });
     }
 });
 
