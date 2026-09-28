@@ -51,13 +51,6 @@ app.post("/api/calculate-fare", async (req, res) => {
 
         const vehicleName = vehicle || "Mahindra Bolero";
 
-        /*
-        IMPORTANT:
-        Gemini gives an estimated road distance.
-        For exact Google Maps road distance,
-        we can later connect Google Routes API.
-        */
-
         const prompt = `
 You are a Sri Lankan vehicle transport fare calculator.
 
@@ -97,9 +90,9 @@ Do not provide explanations.
 Do not use markdown.
 `;
 
-        // Gemini API
+        // Gemini API (Updated with stable gemini-1.5-flash model)
         const apiResponse = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
             {
                 method: "POST",
 
