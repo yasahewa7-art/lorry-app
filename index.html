@@ -1,99 +1,191 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolero Lorry Fare Calculator - Matara Pamburana</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-100 h-screen flex flex-col justify-between">
 
-    <!-- Header -->
-    <header class="bg-blue-900 text-white p-4 text-center shadow-md">
-        <h1 class="text-xl font-bold">🚚 Bolero Lorry Fare Chatbot</h1>
-        <p class="text-sm text-blue-200">මාතර පඹුරුන සිට ඕනෑම ප්‍රදේශයකට ගාස්තු ගණනය කිරීම</p>
-    </header>
+    <title>Paburana Fare Calculator</title>
 
-    <!-- Chat Box -->
-    <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 max-w-2xl mx-auto w-full">
-        <div class="flex justify-start">
-            <div class="bg-white p-3 rounded-lg shadow max-w-xs text-gray-800">
-                ආයුබෝවන්! මාතර පඹුරුන සිට ඔබ යා යුතු ගමනාන්තය (නගරය හෝ ලිපිනය) මෙතැන ටයිප් කරන්න.
-            </div>
-        </div>
-    </div>
-
-    <!-- Input Area -->
-    <div class="bg-white border-t p-4 shadow-lg">
-        <form id="chat-form" class="flex max-w-2xl mx-auto gap-2">
-            <input type="text" id="destination-input" placeholder="උදා: කොළඹ, ගාල්ල, וועලිගම..." 
-                   class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" required>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                යවන්න
-            </button>
-        </form>
-    </div>
-
-    <script>
-        const chatContainer = document.getElementById('chat-container');
-        const chatForm = document.getElementById('chat-form');
-        const destinationInput = document.getElementById('destination-input');
-
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const destination = destinationInput.value.trim();
-            if (!destination) return;
-
-            // User message add
-            appendMessage(destination, 'user');
-            destinationInput.value = '';
-
-            // Loading message
-            const loadingId = appendMessage('ගණනය කරමින් පවතී, කරුණාකර රැඳී සිටින්න...', 'bot');
-
-            try {
-                const response = await fetch('/api/calculate-fare', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ destination })
-                });
-
-                const data = await response.json();
-                
-                // Remove loading
-                document.getElementById(loadingId).remove();
-
-                if (data.success) {
-                    appendMessage(data.result, 'bot');
-                } else {
-                    // සර්වර් එකෙන් එන නියම දෝෂය සහ විස්තරය මෙහි පෙන්වනු ඇත
-                    const errorMsg = data.error || 'දෝෂයක් සිදු විය.';
-                    const fullErrDetails = data.fullError ? `\n\nවිස්තරය: ${data.fullError}` : '';
-                    appendMessage(`⚠️ දෝෂයකි: ${errorMsg}${fullErrDetails}`, 'bot');
-                }
-            } catch (err) {
-                document.getElementById(loadingId).remove();
-                appendMessage('⚠️ සර්වර් එක සමඟ සම්බන්ධ වීමට නොහැකි විය: ' + err.message, 'bot');
-            }
-        });
-
-        function appendMessage(text, sender) {
-            const msgId = 'msg-' + Date.now();
-            const div = document.createElement('div');
-            div.id = msgId;
-            div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
-            
-            const bubble = document.createElement('div');
-            bubble.className = `p-3 rounded-lg shadow max-w-md whitespace-pre-line ${
-                sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'
-            }`;
-            bubble.innerText = text;
-            
-            div.appendChild(bubble);
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return msgId;
+    <style>
+        * {
+            box-sizing: border-box;
         }
-    </script>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f4f7;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 25px;
+            border: none;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #000;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .error {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚚 Fare Calculator</h1>
+
+    <label>Starting Location</label>
+
+    <input
+        type="text"
+        value="Paburana, Matara"
+        readonly
+    >
+
+    <label>Destination</label>
+
+    <input
+        id="destination"
+        type="text"
+        placeholder="Example: Galle"
+    >
+
+    <label>Vehicle</label>
+
+    <select id="vehicle">
+        <option>Mahindra Bolero</option>
+        <option>Dimo Batta</option>
+        <option>Canter</option>
+        <option>Canter 1618</option>
+    </select>
+
+    <button onclick="calculateFare()">
+        Calculate Fare
+    </button>
+
+    <div id="result" class="result"></div>
+
+    <div id="error" class="error"></div>
+
+</div>
+
+<script>
+
+async function calculateFare() {
+
+    const destination =
+        document.getElementById("destination").value.trim();
+
+    const vehicle =
+        document.getElementById("vehicle").value;
+
+    const result =
+        document.getElementById("result");
+
+    const error =
+        document.getElementById("error");
+
+    result.style.display = "none";
+    error.innerText = "";
+
+    if (!destination) {
+        error.innerText =
+            "කරුණාකර destination එක ඇතුළත් කරන්න.";
+        return;
+    }
+
+    result.style.display = "block";
+    result.innerHTML = "⏳ Calculating...";
+
+    try {
+
+        const response = await fetch(
+            "/api/calculate-fare",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    destination: destination,
+                    vehicle: vehicle
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error);
+        }
+
+        result.innerHTML = `
+            <h2>Paburana → ${destination}</h2>
+            <p><strong>Vehicle:</strong> ${vehicle}</p>
+            <hr>
+            <pre style="font-size:18px;white-space:pre-wrap">${data.result}</pre>
+        `;
+
+    } catch (err) {
+
+        result.style.display = "none";
+
+        error.innerText =
+            "Error: " + err.message;
+    }
+}
+
+</script>
+
 </body>
 </html>
