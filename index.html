@@ -1,191 +1,729 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Paburana Fare Calculator</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
 
         body {
+
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f2f4f7;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc
+                );
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
         }
 
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
+        .card {
+
+            width: 100%;
+
+            max-width: 520px;
+
             background: white;
+
+            border-radius: 24px;
+
             padding: 30px;
+
+            box-shadow:
+                0 20px 50px
+                rgba(0, 0, 0, 0.12);
+
+        }
+
+        .logo {
+
+            width: 70px;
+
+            height: 70px;
+
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+
+            background: #111827;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 34px;
+
+            margin: 0 auto 15px;
+
         }
 
         h1 {
+
             text-align: center;
-            margin-bottom: 25px;
+
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 28px;
+
+        }
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #6b7280;
+
+            margin-top: 8px;
+
+            margin-bottom: 28px;
+
         }
 
         label {
+
             display: block;
-            margin-top: 15px;
-            margin-bottom: 7px;
+
             font-weight: bold;
+
+            color: #374151;
+
+            margin-bottom: 8px;
+
+            margin-top: 18px;
+
         }
 
         input,
-        select,
-        button {
+        select {
+
             width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
+
+            padding: 15px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 12px;
+
             font-size: 16px;
+
+            outline: none;
+
+            background: white;
+
+        }
+
+        input:focus,
+        select:focus {
+
+            border-color: #111827;
+
+        }
+
+        input[readonly] {
+
+            background: #f3f4f6;
+
+            color: #4b5563;
+
         }
 
         button {
+
+            width: 100%;
+
+            padding: 16px;
+
             margin-top: 25px;
+
             border: none;
+
+            border-radius: 12px;
+
             background: #111827;
+
             color: white;
-            cursor: pointer;
+
+            font-size: 17px;
+
             font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
         }
 
         button:hover {
-            background: #000;
+
+            background: #000000;
+
+            transform: translateY(-1px);
+
+        }
+
+        button:disabled {
+
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
         }
 
         .result {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f3f4f6;
-            border-radius: 15px;
+
             display: none;
+
+            margin-top: 25px;
+
+            padding: 22px;
+
+            border-radius: 18px;
+
+            background: #f8fafc;
+
+            border: 1px solid #e5e7eb;
+
+        }
+
+        .route {
+
+            font-size: 21px;
+
+            font-weight: bold;
+
+            color: #111827;
+
+            margin-bottom: 15px;
+
+        }
+
+        .vehicle {
+
+            color: #6b7280;
+
+            margin-bottom: 18px;
+
+        }
+
+        .distance {
+
+            font-size: 18px;
+
+            margin: 8px 0;
+
+        }
+
+        .fare {
+
+            font-size: 27px;
+
+            font-weight: bold;
+
+            margin-top: 15px;
+
+            color: #111827;
+
+        }
+
+        .loading {
+
+            text-align: center;
+
+            color: #6b7280;
+
         }
 
         .error {
-            color: red;
+
+            display: none;
+
             margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
         }
+
+        .note {
+
+            margin-top: 20px;
+
+            font-size: 12px;
+
+            color: #9ca3af;
+
+            text-align: center;
+
+            line-height: 1.5;
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-<div class="container">
 
-    <h1>🚚 Fare Calculator</h1>
+<div class="card">
 
-    <label>Starting Location</label>
+
+    <div class="logo">
+
+        🚚
+
+    </div>
+
+
+    <h1>
+
+        Fare Calculator
+
+    </h1>
+
+
+    <div class="subtitle">
+
+        Paburana, Matara
+
+    </div>
+
+
+    <!-- Starting location -->
+
+    <label>
+
+        Starting Location
+
+    </label>
+
 
     <input
+
         type="text"
+
         value="Paburana, Matara"
+
         readonly
+
     >
 
-    <label>Destination</label>
+
+    <!-- Destination -->
+
+    <label>
+
+        Destination
+
+    </label>
+
 
     <input
+
         id="destination"
+
         type="text"
+
         placeholder="Example: Galle"
+
+        autocomplete="off"
+
     >
 
-    <label>Vehicle</label>
+
+    <!-- Vehicle -->
+
+    <label>
+
+        Vehicle Type
+
+    </label>
+
 
     <select id="vehicle">
-        <option>Mahindra Bolero</option>
-        <option>Dimo Batta</option>
-        <option>Canter</option>
-        <option>Canter 1618</option>
+
+        <option value="Mahindra Bolero">
+
+            Mahindra Bolero
+
+        </option>
+
+        <option value="Dimo Batta">
+
+            Dimo Batta
+
+        </option>
+
+        <option value="Canter">
+
+            Canter
+
+        </option>
+
+        <option value="Canter 1618">
+
+            Canter 1618
+
+        </option>
+
     </select>
 
-    <button onclick="calculateFare()">
+
+    <!-- Calculate button -->
+
+    <button
+
+        id="calculateButton"
+
+        onclick="calculateFare()"
+
+    >
+
         Calculate Fare
+
     </button>
 
-    <div id="result" class="result"></div>
 
-    <div id="error" class="error"></div>
+    <!-- Result -->
+
+    <div
+
+        id="result"
+
+        class="result"
+
+    >
+
+    </div>
+
+
+    <!-- Error -->
+
+    <div
+
+        id="error"
+
+        class="error"
+
+    >
+
+    </div>
+
+
+    <div class="note">
+
+        Distance and fare are estimated.
+
+        Exact road distance can be connected
+
+        later using a Maps Routes API.
+
+    </div>
+
 
 </div>
 
+
+
 <script>
+
 
 async function calculateFare() {
 
+
     const destination =
-        document.getElementById("destination").value.trim();
+        document
+        .getElementById("destination")
+        .value
+        .trim();
+
 
     const vehicle =
-        document.getElementById("vehicle").value;
+        document
+        .getElementById("vehicle")
+        .value;
+
 
     const result =
-        document.getElementById("result");
+        document
+        .getElementById("result");
+
 
     const error =
-        document.getElementById("error");
+        document
+        .getElementById("error");
+
+
+    const button =
+        document
+        .getElementById("calculateButton");
+
+
+    // Clear previous results
 
     result.style.display = "none";
+
+    result.innerHTML = "";
+
+    error.style.display = "none";
+
     error.innerText = "";
 
+
+    // Check destination
+
     if (!destination) {
+
         error.innerText =
-            "කරුණාකර destination එක ඇතුළත් කරන්න.";
+            "කරුණාකර Destination එක ඇතුළත් කරන්න.";
+
+        error.style.display = "block";
+
         return;
+
     }
 
+
+    // Loading
+
+    button.disabled = true;
+
+    button.innerText =
+        "⏳ Calculating...";
+
+
     result.style.display = "block";
-    result.innerHTML = "⏳ Calculating...";
+
+    result.innerHTML = `
+        <div class="loading">
+            Calculating distance and fare...
+        </div>
+    `;
+
 
     try {
+
 
         const response = await fetch(
             "/api/calculate-fare",
             {
+
                 method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
+
+                    "Content-Type":
+                        "application/json"
+
                 },
 
                 body: JSON.stringify({
-                    destination: destination,
-                    vehicle: vehicle
+
+                    destination:
+                        destination,
+
+                    vehicle:
+                        vehicle
+
                 })
+
             }
         );
 
-        const data = await response.json();
 
-        if (!data.success) {
-            throw new Error(data.error);
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.error ||
+                "Calculation failed."
+            );
+
         }
 
+
+        // Get result text
+
+        const text =
+            data.result;
+
+
+        // Find Distance
+
+        const distanceMatch =
+            text.match(
+                /Distance:\s*([0-9.,]+)\s*km/i
+            );
+
+
+        // Find Fare
+
+        const fareMatch =
+            text.match(
+                /Fare:\s*Rs\.?\s*([0-9,]+)/i
+            );
+
+
+        let distance =
+            distanceMatch
+            ? distanceMatch[1] + " km"
+            : "Not available";
+
+
+        let fare =
+            fareMatch
+            ? "Rs. " + fareMatch[1]
+            : "Not available";
+
+
         result.innerHTML = `
-            <h2>Paburana → ${destination}</h2>
-            <p><strong>Vehicle:</strong> ${vehicle}</p>
-            <hr>
-            <pre style="font-size:18px;white-space:pre-wrap">${data.result}</pre>
+
+            <div class="route">
+
+                📍 Paburana
+                →
+                ${escapeHtml(destination)}
+
+            </div>
+
+
+            <div class="vehicle">
+
+                🚚 ${escapeHtml(vehicle)}
+
+            </div>
+
+
+            <div class="distance">
+
+                📏 Distance:
+                <strong>
+                    ${distance}
+                </strong>
+
+            </div>
+
+
+            <div class="fare">
+
+                💰 ${fare}
+
+            </div>
+
         `;
 
-    } catch (err) {
+
+    }
+
+    catch (err) {
+
 
         result.style.display = "none";
 
+
         error.innerText =
-            "Error: " + err.message;
+            "Error: " +
+            err.message;
+
+
+        error.style.display = "block";
+
+
     }
+
+    finally {
+
+
+        button.disabled = false;
+
+        button.innerText =
+            "Calculate Fare";
+
+
+    }
+
 }
+
+
+// Prevent HTML injection
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+// Press Enter to calculate
+
+document
+    .getElementById("destination")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                calculateFare();
+
+            }
+
+        }
+    );
+
 
 </script>
 
+
 </body>
+
 </html>
